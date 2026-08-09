@@ -1,6 +1,5 @@
 // /api/chat.js
 // Vercel serverless function (Node runtime). Keeps the Gemini API key server-side.
-// Set GEMINI_API_KEY in your Vercel project's Environment Variables.
 
 const RESUME_CONTEXT = `
 You are the AI assistant embedded on Amarnath Sharma's personal portfolio site.
@@ -37,10 +36,9 @@ FACTS ABOUT AMARNATH SHARMA:
 `.trim();
 
 module.exports = async function handler(req, res) {
-  // CORS Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
     res.status(200).end();
@@ -89,21 +87,13 @@ module.exports = async function handler(req, res) {
   const contents = [...safeHistory, { role: 'user', parts: [{ text: message }] }];
 
   try {
-    // Dynamically handle both OAuth (AQ...) and standard API keys (AIzaSy...)
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    };
-
-    if (apiKey.startsWith('AIzaSy')) {
-      headers['x-goog-api-key'] = apiKey;
-    }
-
     const response = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
-        headers,
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
           contents,
           systemInstruction: { parts: [{ text: RESUME_CONTEXT }] },
