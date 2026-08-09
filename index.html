@@ -48,7 +48,7 @@
   :focus-visible{outline:2px solid var(--teal); outline-offset:3px; border-radius:4px;}
   button{font-family:inherit;}
 
-  /* ---- Decorative animated background (covers the whole page) ---- */
+  /* ---- Decorative animated background ---- */
   .bg-decor{position:fixed; inset:0; z-index:-2; overflow:hidden; pointer-events:none;}
   .blob{position:absolute; border-radius:50%; filter:blur(110px); opacity:.42; will-change:transform;}
   .blob-1{width:640px; height:640px; background:var(--gold); top:-220px; left:-160px; animation:floatA 22s ease-in-out infinite;}
@@ -644,7 +644,7 @@
         <h2>Ask my AI assistant</h2>
         <p>Powered by Gemini, grounded in my resume — ask about my stack, experience, or availability.</p>
       </div>
-      <span class="tag-note">Live · Gemini 3.6 Flash</span>
+      <span class="tag-note">Live · Gemini 1.5 Flash</span>
     </div>
 
     <div class="ask-grid">
@@ -719,8 +719,7 @@
 </footer>
 
 <script>
-  // ---- Certifications: single source of truth for both the trail and the grid ----
-  // Edit the `link` field on each item to point at a real credential URL.
+  // Certifications list
   const CERTIFICATIONS = [
     {title:"MLOps with Vertex AI: Model Evaluation", issuer:"Google Cloud", year:"2025", link:"#"},
     {title:"MLOps for Generative AI", issuer:"Google Cloud", year:"2025", link:"#"},
@@ -762,10 +761,7 @@
     trailTrack.style.animation = 'none';
   }
 
-  // ---- Profile photo: click the + button to pick a photo from your device ----
-  // Stored in this browser's localStorage so it survives reloads on your machine.
-  // To make it show for every visitor once deployed, save the same image as
-  // profile.jpg next to index.html (that file is tried first, before localStorage).
+  // Profile photo handling
   (function () {
     const btn = document.getElementById('photoUploadBtn');
     const input = document.getElementById('photoInput');
@@ -800,7 +796,7 @@
     });
   })();
 
-  // ---- Mobile nav toggle ----
+  // Mobile nav toggle
   (function () {
     const toggle = document.getElementById('navToggle');
     const links = document.getElementById('navLinks');
@@ -814,7 +810,7 @@
     }));
   })();
 
-  // ---- Ask AI chat widget ----
+  // Chat widget handling
   (function () {
     const log = document.getElementById('chatLog');
     const empty = document.getElementById('chatEmpty');
@@ -862,7 +858,8 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: text, history })
         });
-        const data = await res.json();
+
+        const data = await res.json().catch(() => ({}));
         hideTyping();
 
         if (res.ok && data.reply) {
@@ -871,7 +868,10 @@
           history.push({ role: 'model', parts: [{ text: data.reply }] });
           history = history.slice(-12);
         } else {
-          appendMessage('bot', "The assistant isn't configured yet — reach Amarnath directly at sharmaamarnath358@gmail.com.");
+          appendMessage(
+            'bot',
+            data.error || "The assistant isn't configured yet — reach Amarnath directly at sharmaamarnath358@gmail.com."
+          );
         }
       } catch (err) {
         hideTyping();
