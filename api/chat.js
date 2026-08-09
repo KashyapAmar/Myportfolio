@@ -38,7 +38,6 @@ FACTS ABOUT AMARNATH SHARMA:
 
 module.exports = async function handler(req, res) {
   if (req.method === 'GET') {
-    // Quick way to sanity-check the deployment: visit /api/chat directly in the browser.
     res.status(200).json({
       ok: true,
       keyConfigured: Boolean(process.env.GEMINI_API_KEY),
@@ -81,7 +80,7 @@ module.exports = async function handler(req, res) {
 
   try {
     const response = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
       {
         method: 'POST',
         headers: {
